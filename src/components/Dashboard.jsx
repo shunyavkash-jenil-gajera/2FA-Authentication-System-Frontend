@@ -7,6 +7,7 @@ const Dashboard = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loginAccounts, setLoginAccounts] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,7 +19,10 @@ const Dashboard = () => {
     const fetchDashboard = async () => {
       try {
         const response = await authAPI.getDashboard();
+        const accounts = await authAPI.getLoginAccount();
+        console.log(accounts.data, "login Accounty");
         setDashboardData(response);
+        setLoginAccounts(accounts.data);
       } catch (error) {
         console.error("Failed to fetch dashboard:", error);
       } finally {
@@ -55,10 +59,14 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">2FA Authentication System</h1>
+              <h1 className="text-xl font-bold text-gray-900">
+                2FA Authentication System
+              </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">{user?.userName || user?.email}</span>
+              <span className="text-gray-700">
+                {user?.userName || user?.email}
+              </span>
               <button
                 onClick={handleLogout}
                 className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -74,7 +82,9 @@ const Dashboard = () => {
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Dashboard</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Welcome to Dashboard
+              </h2>
 
               <div className="mb-6">
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
@@ -103,13 +113,17 @@ const Dashboard = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">User Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    User Information
+                  </h3>
                   <div className="space-y-2">
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">Name:</span> {user?.userName || "N/A"}
+                      <span className="font-medium">Name:</span>{" "}
+                      {user?.userName || "N/A"}
                     </p>
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">Email:</span> {user?.email || "N/A"}
+                      <span className="font-medium">Email:</span>{" "}
+                      {user?.email || "N/A"}
                     </p>
                     <p className="text-sm text-gray-600">
                       <span className="font-medium">2FA Enabled:</span>{" "}
@@ -123,7 +137,9 @@ const Dashboard = () => {
                 </div>
 
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Security</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Security
+                  </h3>
                   <div className="space-y-2">
                     {!user?.enabled_2fa && (
                       <button
@@ -138,12 +154,20 @@ const Dashboard = () => {
                         <p className="text-sm">
                           <strong>✓ 2FA is enabled</strong>
                           <br />
-                          Your account is protected with two-factor authentication.
+                          Your account is protected with two-factor
+                          authentication.
                         </p>
                       </div>
                     )}
                   </div>
                 </div>
+              </div>
+              <div>
+                {loginAccounts.map((acc) => {
+                  <div className="bg-gray-50 text-gray-600">
+                    asdhfasd{acc.ip}
+                  </div>;
+                })}
               </div>
             </div>
           </div>

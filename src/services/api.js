@@ -9,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Add token to requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -23,7 +22,6 @@ api.interceptors.request.use(
   }
 );
 
-// Handle response errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -72,9 +70,21 @@ export const authAPI = {
     return response.data;
   },
 
+  // GET All Login Account
+  getLoginAccount: async () => {
+    const response = await api.get("/dashboard/login-accounts");
+    return response.data;
+  },
+
   // logout
   logout: async () => {
     const response = await api.post("/auth/logout");
+    return response.data;
+  },
+
+  // logout-all
+  logout: async () => {
+    const response = await api.post("/auth/logout-all");
     return response.data;
   },
 };

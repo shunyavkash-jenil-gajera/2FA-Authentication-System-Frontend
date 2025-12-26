@@ -6,7 +6,6 @@ import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import Setup2FA from "./components/Setup2FA";
 import VerifyOTP from "./components/VerifyOTP";
-import VerifyOTPSetup from "./components/VerifyOTPSetup";
 
 function App() {
   return (
@@ -29,14 +28,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/verify-otp-setup"
-        element={
-          <ProtectedRoute>
-            <VerifyOTPSetup />
-          </ProtectedRoute>
-        }
-      />
+
       <Route path="/verify-otp" element={<VerifyOTP />} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
     </Routes>

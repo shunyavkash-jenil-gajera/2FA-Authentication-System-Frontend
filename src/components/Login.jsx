@@ -28,8 +28,11 @@ const Login = () => {
 
     try {
       const result = await login(formData.email, formData.password);
-
-      navigate("/verify-otp");
+      console.log(result);
+      console.log(result.user);
+      if (result.user.enabled_2fa === true) {
+        navigate("/verify-otp");
+      } else navigate("/setup-2fa");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Login failed");
     } finally {
@@ -39,7 +42,7 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     authAPI.googleAuth();
-  };
+  };  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
 
   const verifyOTP = async (otp, accessToken) => {
     try {
-      // Backend uses req.user._id from authMiddleware, so we don't need to pass userId
+    
       const response = await authAPI.verifyOTP({ otp, accessToken });
       if (response.success) {
         // Update user data after successful 2FA verification
