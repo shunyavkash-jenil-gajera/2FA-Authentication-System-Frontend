@@ -28,18 +28,46 @@ const AuthCallback = () => {
 
           if (userDataFromUrl) {
             try {
-              const userData = userDataFromUrl;
-              console.log(userData);
-              localStorage.setItem("user", JSON.stringify(userData));
+              // try parse JSON first
+              const decode = decodeURIComponent(userDataFromUrl);
+              let parsed;
+              try {
+                parsed = JSON.parse(decode);
+              } catch (e) {
+                // normalize non-JSON JS-object-like string into JSON
+                let s = decode;
+                s = s.replace(/new ObjectId\('\s*([^']+)\s*'\)/g, '"$1"');
+                s = s.replace(/([,{\s])([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+                s = s.replace(/'([^']*)'/g, '"$1"');
+                // quote ISO dates like 2025-12-29T18:12:10.095Z
+                s = s.replace(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)/g, '"$1"');
+                // remove trailing commas
+                s = s.replace(/,\s*}/g, "}").replace(/,\s*]/g, "]");
+                parsed = JSON.parse(s);
+              }
+
+              // ensure _id is string
+              if (parsed && parsed._id && typeof parsed._id === "object" && parsed._id.$oid) {
+                parsed._id = parsed._id.$oid;
+              }
+
+              localStorage.setItem("user", JSON.stringify(parsed));
+
+              // Set otpVerified based on whether 2FA is enabled
+              if (parsed?.enabled_2fa) {
+                localStorage.setItem("otpVerified", "false");
+              } else {
+                localStorage.setItem("otpVerified", "true");
+              }
             } catch (e) {
-              console.warn("Could not parse user data from URL");
+              console.warn("Could not parse user data from URL", e);
             }
           }
 
           setTimeout(() => {
             const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
             if (storedUser?.enabled_2fa) {
-              navigate("/dashboard", { replace: true });
+              navigate("/verify-otp", { replace: true });
             } else {
               navigate("/setup-2fa", { replace: true });
             }
@@ -63,13 +91,20 @@ const AuthCallback = () => {
             localStorage.setItem("accessToken", data.data.accessToken);
             localStorage.setItem("user", JSON.stringify(data.data.user));
 
-            setTimeout(() => {
-              if (data.data.user?.enabled_2fa) {
-                navigate("/dashboard", { replace: true });
-              } else {
+            // Set otpVerified based on whether 2FA is enabled
+            if (data.data.user?.enabled_2fa) {
+              localStorage.setItem("otpVerified", "false");
+              // Redirect to verify OTP
+              setTimeout(() => {
+                navigate("/verify-otp", { replace: true });
+              }, 100);
+            } else {
+              localStorage.setItem("otpVerified", "true");
+              // Redirect to setup 2FA
+              setTimeout(() => {
                 navigate("/setup-2fa", { replace: true });
-              }
-            }, 100);
+              }, 100);
+            }
           } else {
             setError("Authentication failed. Please try again.");
             setTimeout(() => navigate("/login", { replace: true }), 2000);
@@ -77,9 +112,7 @@ const AuthCallback = () => {
         }
       } catch (error) {
         console.error("Auth callback error:", error);
-        setError(
-          error.message || "Authentication error. Redirecting to login..."
-        );
+        setError(error.message || "Authentication error. Redirecting to login...");
         setTimeout(() => navigate("/login", { replace: true }), 2000);
       } finally {
         setLoading(false);

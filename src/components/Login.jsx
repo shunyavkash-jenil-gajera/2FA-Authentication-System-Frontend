@@ -14,8 +14,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   if (isAuthenticated) {
-    if (user?.enabled_2fa) return <Navigate to="/verify-otp" replace />;
-    return <Navigate to="/setup-2fa" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleChange = (e) => {
@@ -36,8 +35,9 @@ const Login = () => {
       if (result?.require2FA) {
         navigate("/verify-otp");
       } else if (result?.user) {
+        // If user has 2FA enabled, they must verify OTP first
         if (result.user.enabled_2fa) {
-          navigate("/dashboard");
+          navigate("/verify-otp");
         } else {
           navigate("/setup-2fa");
         }
@@ -118,11 +118,7 @@ const Login = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="auth-google-button"
-          >
+          <button type="button" onClick={handleGoogleLogin} className="auth-google-button">
             <svg className="auth-google-icon" viewBox="0 0 24 24">
               <path
                 fill="currentColor"

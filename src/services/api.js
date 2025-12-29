@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://55g7h3d4-4001.inc1.devtunnels.ms/api/v1";
+const API_BASE_URL = "https://zj0r8lpr-4001.inc1.devtunnels.ms/api/v1";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -25,11 +25,19 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const msg = error.response?.data?.message;
+    // Clear client state and force login when session is missing or unauthorized
+    if (
+      error.response?.status === 401 ||
+      msg === "Session Not Found Please login" ||
+      (typeof msg === "string" && msg.includes("Session Not Found"))
+    ) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
+      localStorage.removeItem("otpVerified");
       window.location.href = "/login";
     }
+
     return Promise.reject(error);
   }
 );

@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const [otpVerified, setOtpVerified] = useState(false);
   const safeParse = (jsonString, fallback = null) => {
     if (!jsonString) return fallback;
     try {
@@ -28,12 +29,20 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
     const storedUserRaw = localStorage.getItem("user");
+    const storedOtpVerified = localStorage.getItem("otpVerified") === "true";
 
     if (storedToken && storedUserRaw) {
       const parsedUser = safeParse(storedUserRaw);
       if (parsedUser) {
         setToken(storedToken);
         setUser(parsedUser);
+        // if user doesn't have 2FA enabled, consider verified by default
+        if (!parsedUser.enabled_2fa) {
+          setOtpVerified(true);
+          localStorage.setItem("otpVerified", "true");
+        } else {
+          setOtpVerified(storedOtpVerified);
+        }
       } else {
         // Clear invalid data
         localStorage.removeItem("accessToken");
@@ -57,6 +66,14 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem("user", JSON.stringify(userData));
           setToken(accessToken);
           setUser(userData);
+          if (userData.enabled_2fa) {
+            // 2FA is enabled but not yet verified for this session
+            setOtpVerified(false);
+            localStorage.setItem("otpVerified", "false");
+          } else {
+            setOtpVerified(true);
+            localStorage.setItem("otpVerified", "true");
+          }
           return { success: true, user: userData };
         }
       }
@@ -76,6 +93,13 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(userData));
         setToken(accessToken);
         setUser(userData);
+        if (userData.enabled_2fa) {
+          setOtpVerified(false);
+          localStorage.setItem("otpVerified", "false");
+        } else {
+          setOtpVerified(true);
+          localStorage.setItem("otpVerified", "true");
+        }
         return { success: true, user: userData };
       }
       throw new Error(response.message || "Registration failed");
@@ -88,9 +112,11 @@ export const AuthProvider = ({ children }) => {
     const response = await authAPI.logout();
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
+    localStorage.removeItem("otpVerified");
 
     setToken(null);
     setUser(null);
+    setOtpVerified(false);
   };
   const logoutAll = async (accessToken) => {
     const response = await authAPI.logoutAll({ accessToken });
@@ -99,6 +125,7 @@ export const AuthProvider = ({ children }) => {
 
     setToken(null);
     setUser(null);
+    setOtpVerified(false);
   };
 
   const enable2FA = async () => {
@@ -118,10 +145,7 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.verifyOTP({ otp, accessToken });
       if (response.success) {
         if (response.data.session?.accessToken) {
-          localStorage.setItem(
-            "accessToken",
-            response.data.session.accessToken
-          );
+          localStorage.setItem("accessToken", response.data.session.accessToken);
           setToken(response.data.session.accessToken);
         }
         const storedUser = localStorage.getItem("user");
@@ -131,6 +155,8 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem("user", JSON.stringify(userData));
           setUser(userData);
         }
+        setOtpVerified(true);
+        localStorage.setItem("otpVerified", "true");
         return { success: true, data: response.data };
       }
       throw new Error(response.message || "OTP verification failed");
@@ -143,13 +169,14 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     loading,
+    otpVerified,
     login,
     register,
     logout,
     logoutAll,
     enable2FA,
     verifyOTP,
-    isAuthenticated: !!user && !!token,
+    isAuthenticated: !!user && !!token && (!user.enabled_2fa || otpVerified),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

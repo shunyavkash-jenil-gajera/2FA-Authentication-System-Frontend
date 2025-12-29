@@ -15,8 +15,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   if (isAuthenticated) {
-    if (user?.enabled_2fa) return <Navigate to="/verify-otp" replace />;
-    return <Navigate to="/setup-2fa" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleChange = (e) => {
@@ -60,9 +59,7 @@ const Register = () => {
       await register(formData.userName, formData.email, formData.password);
       navigate("/setup-2fa");
     } catch (err) {
-      setError(
-        err.response?.data?.message || err.message || "Registration failed"
-      );
+      setError(err.response?.data?.message || err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
