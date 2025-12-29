@@ -61,7 +61,7 @@ export const authAPI = {
 
   // Google Auth
   googleAuth: () => {
-    window.location.href = `${API_BASE_URL}/auth/google`;
+    window.location.href = `${API_BASE_URL}/auth/google?redirectUrl=${window.location.origin}/auth-callback`;
   },
 
   // Dashboard/Home
@@ -83,7 +83,7 @@ export const authAPI = {
   },
 
   // logout-all
-  logout: async () => {
+  logoutAll: async () => {
     const response = await api.post("/auth/logout-all");
     return response.data;
   },

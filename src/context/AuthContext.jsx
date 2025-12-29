@@ -15,13 +15,30 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const safeParse = (jsonString, fallback = null) => {
+    if (!jsonString) return fallback;
+    try {
+      return JSON.parse(jsonString);
+    } catch {
+      console.error("Invalid user data in localStorage, clearing...");
+      localStorage.removeItem("user");
+      return fallback;
+    }
+  };
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
-    const storedUser = localStorage.getItem("user");
+    const storedUserRaw = localStorage.getItem("user");
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    if (storedToken && storedUserRaw) {
+      const parsedUser = safeParse(storedUserRaw);
+      if (parsedUser) {
+        setToken(storedToken);
+        setUser(parsedUser);
+      } else {
+        // Clear invalid data
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+      }
     }
     setLoading(false);
   }, []);
@@ -35,6 +52,7 @@ export const AuthProvider = ({ children }) => {
           return { require2FA: true, userId: response.data.UserId };
         } else {
           const { accessToken, user: userData } = response.data;
+          console.log(userData, "user data login ");
           localStorage.setItem("accessToken", accessToken);
           localStorage.setItem("user", JSON.stringify(userData));
           setToken(accessToken);
@@ -74,6 +92,14 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
   };
+  const logoutAll = async (accessToken) => {
+    const response = await authAPI.logoutAll({ accessToken });
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+
+    setToken(null);
+    setUser(null);
+  };
 
   const enable2FA = async () => {
     try {
@@ -89,10 +115,8 @@ export const AuthProvider = ({ children }) => {
 
   const verifyOTP = async (otp, accessToken) => {
     try {
-    
       const response = await authAPI.verifyOTP({ otp, accessToken });
       if (response.success) {
-        // Update user data after successful 2FA verification
         if (response.data.session?.accessToken) {
           localStorage.setItem(
             "accessToken",
@@ -100,7 +124,6 @@ export const AuthProvider = ({ children }) => {
           );
           setToken(response.data.session.accessToken);
         }
-        // Refresh user data
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const userData = JSON.parse(storedUser);
@@ -123,6 +146,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    logoutAll,
     enable2FA,
     verifyOTP,
     isAuthenticated: !!user && !!token,

@@ -6,12 +6,18 @@ import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import Setup2FA from "./components/Setup2FA";
 import VerifyOTP from "./components/VerifyOTP";
+import AuthCallback from "./components/AuthCallback";
 
 function App() {
   return (
     <Routes>
+      {/* Public auth routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/auth-callback" element={<AuthCallback />} />
+      <Route path="/verify-otp" element={<VerifyOTP />} />
+
+      {/* Protected routes */}
       <Route
         path="/dashboard"
         element={
@@ -29,7 +35,7 @@ function App() {
         }
       />
 
-      <Route path="/verify-otp" element={<VerifyOTP />} />
+      {/* Default redirect */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
