@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
         if (parsedUser.enabled_2fa) {
           setOtpVerified(storedOtpVerified);
         } else {
-          setOtpVerified(false); // Force 2FA setup
+          setOtpVerified(false);
         }
       } else {
         localStorage.removeItem("accessToken");

@@ -26,7 +26,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const msg = error.response?.data?.message;
-    // Clear client state and force login when session is missing or unauthorized
     if (
       error.response?.status === 401 ||
       msg === "Session Not Found Please login" ||
