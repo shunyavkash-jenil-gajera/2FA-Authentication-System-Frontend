@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { authAPI } from "../services/api";
 
@@ -12,10 +12,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
 
   const handleChange = (e) => {
     setFormData({
@@ -32,20 +28,14 @@ const Login = () => {
 
     try {
       const result = await login(formData.email, formData.password);
+
       if (result?.require2FA) {
         navigate("/verify-otp");
-      } else if (result?.user) {
-        // If user has 2FA enabled, they must verify OTP first
-        if (result.user.enabled_2fa) {
-          navigate("/verify-otp");
-        } else {
-          navigate("/setup-2fa");
-        }
-      } else {
-        navigate("/login");
+      } else if (result?.success) {
+        navigate("/dashboard");
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Login failed");
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -118,7 +108,11 @@ const Login = () => {
             </div>
           </div>
 
-          <button type="button" onClick={handleGoogleLogin} className="auth-google-button">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="auth-google-button"
+          >
             <svg className="auth-google-icon" viewBox="0 0 24 24">
               <path
                 fill="currentColor"

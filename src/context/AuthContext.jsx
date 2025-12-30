@@ -36,15 +36,12 @@ export const AuthProvider = ({ children }) => {
       if (parsedUser) {
         setToken(storedToken);
         setUser(parsedUser);
-        // if user doesn't have 2FA enabled, consider verified by default
-        if (!parsedUser.enabled_2fa) {
-          setOtpVerified(true);
-          localStorage.setItem("otpVerified", "true");
-        } else {
+        if (parsedUser.enabled_2fa) {
           setOtpVerified(storedOtpVerified);
+        } else {
+          setOtpVerified(false); // Force 2FA setup
         }
       } else {
-        // Clear invalid data
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
       }
@@ -61,13 +58,11 @@ export const AuthProvider = ({ children }) => {
           return { require2FA: true, userId: response.data.UserId };
         } else {
           const { accessToken, user: userData } = response.data;
-          console.log(userData, "user data login ");
           localStorage.setItem("accessToken", accessToken);
           localStorage.setItem("user", JSON.stringify(userData));
           setToken(accessToken);
           setUser(userData);
           if (userData.enabled_2fa) {
-            // 2FA is enabled but not yet verified for this session
             setOtpVerified(false);
             localStorage.setItem("otpVerified", "false");
           } else {
@@ -109,7 +104,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    const response = await authAPI.logout();
+    await authAPI.logout();
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
     localStorage.removeItem("otpVerified");
@@ -118,10 +113,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setOtpVerified(false);
   };
+
   const logoutAll = async (accessToken) => {
-    const response = await authAPI.logoutAll({ accessToken });
+    await authAPI.logoutAll({ accessToken });
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
+    localStorage.removeItem("otpVerified");
 
     setToken(null);
     setUser(null);
@@ -145,7 +142,10 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.verifyOTP({ otp, accessToken });
       if (response.success) {
         if (response.data.session?.accessToken) {
-          localStorage.setItem("accessToken", response.data.session.accessToken);
+          localStorage.setItem(
+            "accessToken",
+            response.data.session.accessToken
+          );
           setToken(response.data.session.accessToken);
         }
         const storedUser = localStorage.getItem("user");
@@ -176,7 +176,9 @@ export const AuthProvider = ({ children }) => {
     logoutAll,
     enable2FA,
     verifyOTP,
-    isAuthenticated: !!user && !!token && (!user.enabled_2fa || otpVerified),
+    needs2FASetup: !!user && !user?.enabled_2fa && !!token,
+    is2FARequired: !!user?.enabled_2fa && !!token && !otpVerified,
+    isAuthenticated: !!user && !!token && user?.enabled_2fa && otpVerified,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -9,11 +9,6 @@ const VerifyOTP = () => {
   const { verifyOTP, token, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  if (isAuthenticated && user?.enabled_2fa) {
-    console.log(isAuthenticated && user?.enabled_2fa, "v.jsx");
-    return <Navigate to="/dashboard" replace />;
-  }
-
   const handleChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 6);
     setOtp(value);

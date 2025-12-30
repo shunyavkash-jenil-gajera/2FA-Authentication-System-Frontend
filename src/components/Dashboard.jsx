@@ -36,6 +36,7 @@ const Dashboard = () => {
     logout();
     navigate("/login");
   };
+
   const handleAllLogout = () => {
     logoutAll(token);
     navigate("/login");
@@ -147,17 +148,25 @@ const Dashboard = () => {
                 </div>
               </div>
               <div>
-                {loginAccounts.map((acc) => {
-                  return (
-                    <div className="bg-gray-50 text-gray-600" key={acc.ip}>
-                      {acc.ip}
-                    </div>
-                  );
-                })}
+                <div className="card-section">
+                  <h3 className="card-section-title">User Logged in Devices</h3>
+                  {loginAccounts.map((acc) => {
+                    return (
+                      <div key={acc._id} className="device-list">
+                        <p className="device-text">
+                          <strong>Device:</strong> {acc?.deviceName || "N/A"}
+                        </p>
+                        <p className="device-text">
+                          <strong>Device Ip:</strong> {acc?.ip || "N/A"}
+                        </p>
+                      </div>
+                    );
+                  })}
+                  <button onClick={handleAllLogout} className="logout-button">
+                    Logout All Account
+                  </button>
+                </div>
               </div>
-              <button onClick={handleAllLogout} className="logout-button">
-                Logout All Account
-              </button>
             </div>
           </div>
         </div>

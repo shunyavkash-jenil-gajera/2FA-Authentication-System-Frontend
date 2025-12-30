@@ -11,13 +11,11 @@ import AuthCallback from "./components/AuthCallback";
 function App() {
   return (
     <Routes>
-      {/* Public auth routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/auth-callback" element={<AuthCallback />} />
       <Route path="/verify-otp" element={<VerifyOTP />} />
 
-      {/* Protected routes */}
       <Route
         path="/dashboard"
         element={
@@ -35,7 +33,6 @@ function App() {
         }
       />
 
-      {/* Default redirect */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

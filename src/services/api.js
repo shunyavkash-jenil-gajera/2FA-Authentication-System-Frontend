@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://zj0r8lpr-4001.inc1.devtunnels.ms/api/v1";
+const API_BASE_URL = "https://55g7h3d4-4001.inc1.devtunnels.ms/api/v1";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -55,7 +55,7 @@ export const authAPI = {
     return response.data;
   },
 
-  // Enable 2FA (Generate QR Code)
+  // Enable 2FA
   enable2FA: async () => {
     const response = await api.post("/auth/enable-2fa");
     return response.data;
