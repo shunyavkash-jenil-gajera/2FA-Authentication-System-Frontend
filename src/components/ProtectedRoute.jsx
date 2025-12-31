@@ -6,7 +6,7 @@ import Loading from "./Loading.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
-  const { user, token, loading, needs2FASetup, is2FARequired } = useAuth();
+  const { user, token, loading, needs2FASetup, is2FARequired, skipTwoFA } = useAuth();
 
   if (loading) return <Loading />;
   if (!user || !token) return <Navigate to="/login" replace />;
@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children }) => {
     return <Setup2FA />;
   }
 
-  if (is2FARequired) {
+  if (is2FARequired && !skipTwoFA) {
     navigate("/verify-otp", { replace: true });
     return <VerifyOTP />;
   }

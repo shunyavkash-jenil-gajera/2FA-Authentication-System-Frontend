@@ -1,4 +1,5 @@
-export const API_BASE_URL = "https://55g7h3d4-4001.inc1.devtunnels.ms/api/v1";
+export const API_BASE_URL = "http://localhost:4001/api/v1";
+
 export const AUTH_ROUTE = {
   REGISTER: "/auth/register",
   LOGIN: "/auth/login",
@@ -8,6 +9,7 @@ export const AUTH_ROUTE = {
   GOOGLE_CALLBACK: "/auth/google/callback",
   LOGOUT: "/auth/logout",
   LOGOUT_ALL_ACCOUNT: "/auth/logout-all",
+  LOGOUT_DEVICE: "/auth/logout-device",
 
   GET_DASHBOARD: "/dashboard",
   GET_LOGIN_ACCOUNTS: "/dashboard/login-accounts",

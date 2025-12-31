@@ -29,8 +29,9 @@ const Login = () => {
     try {
       const result = await login(formData.email, formData.password);
 
-      if (result?.require2FA) {
-        navigate("/verify-otp");
+      if (result?.skipTwoFA) {
+        // User has trusted device, skip 2FA
+        navigate("/dashboard");
       } else if (result?.success) {
         navigate("/dashboard");
       }
@@ -108,11 +109,7 @@ const Login = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="auth-google-button"
-          >
+          <button type="button" onClick={handleGoogleLogin} className="auth-google-button">
             <svg className="auth-google-icon" viewBox="0 0 24 24">
               <path
                 fill="currentColor"

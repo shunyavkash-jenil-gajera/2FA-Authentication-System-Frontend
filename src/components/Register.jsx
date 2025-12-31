@@ -4,9 +4,9 @@ import { useAuth } from "../context/AuthContext";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    userName: "",
-    email: "",
-    password: "",
+    userName: "Jenil Gajera",
+    email: "jenil@gmail.com",
+    password: "Jenil@1234",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);

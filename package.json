@@ -1,7 +1,7 @@
 {
   "name": "2fa-authentication-system",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,8 @@
     "axios": "^1.13.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^7.11.0"
+    "react-router-dom": "^7.11.0",
+    "@fingerprintjs/fingerprintjs": "^4.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

@@ -99,6 +99,14 @@ export const authAPI = {
     const response = await api.post(AUTH_ROUTE.LOGOUT_ALL_ACCOUNT);
     return response.data;
   },
+
+  // logout from specific device
+  logoutFromDevice: async (sessionId) => {
+    const response = await api.post(AUTH_ROUTE.LOGOUT_DEVICE, {
+      sessionId,
+    });
+    return response.data;
+  },
 };
 
 export default api;
