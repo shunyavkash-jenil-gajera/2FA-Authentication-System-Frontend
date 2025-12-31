@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { authAPI } from "../services/api.js";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -75,13 +76,7 @@ const AuthCallback = () => {
             }
           }, 100);
         } else {
-          const response = await fetch(
-            "https://55g7h3d4-4001.inc1.devtunnels.ms/api/v1/auth/google/callback",
-            {
-              method: "GET",
-              credentials: "include",
-            }
-          );
+          const response = await authAPI.googleCallback();
 
           if (!response.ok) {
             throw new Error(`Backend response error: ${response.status}`);

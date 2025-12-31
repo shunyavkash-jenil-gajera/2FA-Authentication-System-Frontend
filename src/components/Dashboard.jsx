@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { authAPI } from "../services/api";
+import Loading from "./Loading.jsx";
 
 const Dashboard = () => {
   const { user, logout, token, logoutAll, isAuthenticated } = useAuth();
@@ -47,14 +48,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="auth-wrapper">
-        <div className="text-center">
-          <div className="spinner"></div>
-          <p className="loading-text">Loading dashboard...</p>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

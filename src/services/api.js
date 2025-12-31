@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const API_BASE_URL = "https://55g7h3d4-4001.inc1.devtunnels.ms/api/v1";
+import { API_BASE_URL, AUTH_ROUTE } from "../utils/constants.util.js";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -44,54 +43,60 @@ api.interceptors.response.use(
 export const authAPI = {
   // Register
   register: async (userData) => {
-    const response = await api.post("/auth/register", userData);
+    const response = await api.post(AUTH_ROUTE.REGISTER, userData);
     return response.data;
   },
 
   // Login
   login: async (credentials) => {
-    const response = await api.post("/auth/login", credentials);
+    const response = await api.post(AUTH_ROUTE.LOGIN, credentials);
     return response.data;
   },
 
   // Enable 2FA
   enable2FA: async () => {
-    const response = await api.post("/auth/enable-2fa");
+    const response = await api.post(AUTH_ROUTE.ENABLE_2FA);
     return response.data;
   },
 
   // Verify OTP
   verifyOTP: async (otpData) => {
-    const response = await api.post("/auth/verifyOtp", otpData);
+    const response = await api.post(AUTH_ROUTE.VERIFY_OTP, otpData);
     return response.data;
   },
 
   // Google Auth
   googleAuth: () => {
-    window.location.href = `${API_BASE_URL}/auth/google?redirectUrl=${window.location.origin}/auth-callback`;
+    window.location.href = `${API_BASE_URL}${AUTH_ROUTE.GOOGLE}?redirectUrl=${window.location.origin}/auth-callback`;
+  },
+
+  // Google Callback
+  googleCallback: async () => {
+    const response = await api.get(AUTH_ROUTE.GOOGLE_CALLBACK);
+    return response.data;
   },
 
   // Dashboard/Home
   getDashboard: async () => {
-    const response = await api.get("/dashboard");
+    const response = await api.get(AUTH_ROUTE.GET_DASHBOARD);
     return response.data;
   },
 
   // GET All Login Account
   getLoginAccount: async () => {
-    const response = await api.get("/dashboard/login-accounts");
+    const response = await api.get(AUTH_ROUTE.GET_LOGIN_ACCOUNTS);
     return response.data;
   },
 
   // logout
   logout: async () => {
-    const response = await api.post("/auth/logout");
+    const response = await api.post(AUTH_ROUTE.LOGOUT);
     return response.data;
   },
 
   // logout-all
   logoutAll: async () => {
-    const response = await api.post("/auth/logout-all");
+    const response = await api.post(AUTH_ROUTE.LOGOUT_ALL_ACCOUNT);
     return response.data;
   },
 };
