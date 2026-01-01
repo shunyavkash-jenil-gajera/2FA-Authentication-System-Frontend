@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Check if 2FA has expired
   const checkTwoFAExpiry = () => {
     const twoFaExpiryStr = localStorage.getItem("twoFaExpiry");
     if (!twoFaExpiryStr) return false;
@@ -40,7 +39,6 @@ export const AuthProvider = ({ children }) => {
     const now = new Date();
 
     if (expiryDate < now) {
-      // 2FA expired - clear it
       localStorage.removeItem("otpVerified");
       localStorage.removeItem("twoFaExpiry");
       return true;
@@ -58,7 +56,6 @@ export const AuthProvider = ({ children }) => {
         const storedUserRaw = localStorage.getItem("user");
         let storedOtpVerified = localStorage.getItem("otpVerified") === "true";
 
-        // Check 2FA expiry
         if (storedOtpVerified && checkTwoFAExpiry()) {
           storedOtpVerified = false;
         }
@@ -98,13 +95,17 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.success) {
-        const { accessToken, user: userData, skipTwoFA: skip2FA, session } = response.data;
+        const {
+          accessToken,
+          user: userData,
+          skipTwoFA: skip2FA,
+          session,
+        } = response.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(userData));
         setToken(accessToken);
         setUser(userData);
 
-        // Store 2FA expiry time
         if (session?.twoFaExpiry) {
           localStorage.setItem("twoFaExpiry", session.twoFaExpiry);
         }
@@ -148,7 +149,6 @@ export const AuthProvider = ({ children }) => {
         setToken(accessToken);
         setUser(userData);
 
-        // Store 2FA expiry time
         if (session?.twoFaExpiry) {
           localStorage.setItem("twoFaExpiry", session.twoFaExpiry);
         }
@@ -219,13 +219,18 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.verifyOTP({ otp, accessToken });
       if (response.success) {
         if (response.data.session?.accessToken) {
-          localStorage.setItem("accessToken", response.data.session.accessToken);
+          localStorage.setItem(
+            "accessToken",
+            response.data.session.accessToken
+          );
           setToken(response.data.session.accessToken);
         }
 
-        // Store 2FA expiry time
         if (response.data.session?.twoFaExpiry) {
-          localStorage.setItem("twoFaExpiry", response.data.session.twoFaExpiry);
+          localStorage.setItem(
+            "twoFaExpiry",
+            response.data.session.twoFaExpiry
+          );
         }
 
         const storedUser = localStorage.getItem("user");

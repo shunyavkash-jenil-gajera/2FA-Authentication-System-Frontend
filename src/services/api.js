@@ -100,7 +100,7 @@ export const authAPI = {
     return response.data;
   },
 
-  // logout from specific device
+  // logout from device
   logoutFromDevice: async (sessionId) => {
     const response = await api.post(AUTH_ROUTE.LOGOUT_DEVICE, {
       sessionId,
