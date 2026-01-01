@@ -9,9 +9,9 @@ const Register = () => {
     password: "Jenil@1234",
   });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { register, isAuthenticated, user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   if (isAuthenticated) {
@@ -59,11 +59,15 @@ const Register = () => {
       await register(formData.userName, formData.email, formData.password);
       navigate("/setup-2fa");
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Registration failed");
+      setError(
+        err.response?.data?.message || err.message || "Registration failed"
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  const toggleShowPassword = () => setShowPassword((prev) => !prev);
 
   return (
     <div className="auth-wrapper">
@@ -115,14 +119,14 @@ const Register = () => {
                 onChange={handleChange}
               />
             </div>
-            <div>
+            <div className="input-group password-group">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 required
                 className="auth-input auth-input-last"
@@ -130,6 +134,13 @@ const Register = () => {
                 value={formData.password}
                 onChange={handleChange}
               />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={toggleShowPassword}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
             </div>
           </div>
 

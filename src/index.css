@@ -701,3 +701,40 @@ body {
   outline: none;
   box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.5);
 }
+
+/* ===================== */
+
+.input-group {
+  position: relative;
+  width: 100%;
+}
+
+.password-group {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #a5b4fc;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggle-password:hover {
+  color: #c7d2fe;
+}
+
+.toggle-password:focus {
+  outline: none;
+}
+
+.password-group .auth-input {
+  padding-right: 3rem;
+}

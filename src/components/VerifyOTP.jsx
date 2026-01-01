@@ -6,7 +6,7 @@ const VerifyOTP = () => {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { verifyOTP, token, isAuthenticated, user } = useAuth();
+  const { verifyOTP, token } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,9 +25,7 @@ const VerifyOTP = () => {
     }
 
     if (!token) {
-      setError(
-        "Please login first. The verify OTP endpoint requires authentication."
-      );
+      setError("Please login first.");
       navigate("/login");
       return;
     }

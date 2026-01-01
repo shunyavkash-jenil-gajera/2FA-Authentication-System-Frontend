@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { authAPI } from "../services/api.js";
+import { authAPI } from "../services/api.service.js";
 import { getDeviceFingerprint } from "../services/fingerprint.service.js";
 
 const AuthContext = createContext();

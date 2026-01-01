@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { authAPI } from "../services/api";
+import { authAPI } from "../services/api.service";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +10,8 @@ const Login = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login, isAuthenticated, user } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -28,9 +29,7 @@ const Login = () => {
 
     try {
       const result = await login(formData.email, formData.password);
-
       if (result?.skipTwoFA) {
-        // User has trusted device, skip 2FA
         navigate("/dashboard");
       } else if (result?.success) {
         navigate("/dashboard");
@@ -45,6 +44,8 @@ const Login = () => {
   const handleGoogleLogin = () => {
     authAPI.googleAuth();
   };
+
+  const toggleShowPassword = () => setShowPassword((prev) => !prev);
 
   return (
     <div className="auth-wrapper">
@@ -81,14 +82,15 @@ const Login = () => {
                 onChange={handleChange}
               />
             </div>
-            <div>
+            <div className="input-group password-group">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
+
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 required
                 className="auth-input auth-input-last"
@@ -96,6 +98,14 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
               />
+
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={toggleShowPassword}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
             </div>
           </div>
 
@@ -109,7 +119,11 @@ const Login = () => {
             </div>
           </div>
 
-          <button type="button" onClick={handleGoogleLogin} className="auth-google-button">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="auth-google-button"
+          >
             <svg className="auth-google-icon" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
