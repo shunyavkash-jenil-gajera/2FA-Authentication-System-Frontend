@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { authAPI } from "../services/api.service.js";
 import Loading from "./Loading.jsx";
+import Disable2FA from "./Disable2FA.jsx";
 
 const Dashboard = () => {
   const { user, logout, token, logoutAll, isAuthenticated } = useAuth();
@@ -10,6 +11,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [loginAccounts, setLoginAccounts] = useState(null);
   const [loggingOutDeviceId, setLoggingOutDeviceId] = useState(null);
+  const [showDisable2FAModal, setShowDisable2FAModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,9 +47,7 @@ const Dashboard = () => {
   };
 
   const handleLogoutFromDevice = async (sessionId, deviceName) => {
-    const isConfirmed = window.confirm(
-      `Are you sure you want to logout from "${deviceName}"?`
-    );
+    const isConfirmed = window.confirm(`Are you sure you want to logout from "${deviceName}"?`);
 
     if (!isConfirmed) {
       return;
@@ -84,9 +84,7 @@ const Dashboard = () => {
         <div className="navbar-content">
           <div className="navbar-title">2FA Authentication System</div>
           <div className="navbar-user-section">
-            <span className="navbar-username">
-              {user?.userName || user?.email}
-            </span>
+            <span className="navbar-username">{user?.userName || user?.email}</span>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
@@ -97,9 +95,10 @@ const Dashboard = () => {
       <main className="dashboard-main">
         <div className="dashboard-content">
           <div className="dashboard-card">
+            {" "}
             <div className="dashboard-card-content">
+              {" "}
               <h2 className="dashboard-heading">Welcome to Dashboard</h2>
-
               <div className="info-box">
                 <div style={{ display: "flex" }}>
                   <div className="info-content">
@@ -109,7 +108,6 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-
               <div className="grid-layout">
                 <div className="card-section">
                   <h3 className="card-section-title">User Information</h3>
@@ -135,21 +133,26 @@ const Dashboard = () => {
                   <h3 className="card-section-title">Security</h3>
                   <div className="card-section-content">
                     {!user?.enabled_2fa && (
-                      <button
-                        onClick={handleEnable2FA}
-                        className="enable-2fa-button"
-                      >
+                      <button onClick={handleEnable2FA} className="enable-2fa-button">
                         Enable Two-Factor Authentication
                       </button>
                     )}
                     {user?.enabled_2fa && (
-                      <div className="success-box">
-                        <p>
-                          <strong>✓ 2FA is enabled</strong>
-                          <br />
-                          Your account is protected with two-factor
-                          authentication.
-                        </p>
+                      <div>
+                        <div className="success-box">
+                          <p>
+                            <strong>✓ 2FA is enabled</strong>
+                            <br />
+                            Your account is protected with two-factor authentication.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setShowDisable2FAModal(true)}
+                          className="disable-2fa-button"
+                          style={{ marginTop: "10px" }}
+                        >
+                          Disable Two-Factor Authentication
+                        </button>
                       </div>
                     )}
                   </div>
@@ -161,9 +164,7 @@ const Dashboard = () => {
                   {loginAccounts && loginAccounts.length > 0 ? (
                     <>
                       {loginAccounts.map((acc) => {
-                        const loginDate = new Date(
-                          acc.loginDate
-                        ).toLocaleString();
+                        const loginDate = new Date(acc.loginDate).toLocaleString();
                         return (
                           <div key={acc.sessionId} className="device-item">
                             <div className="device-info">
@@ -175,17 +176,14 @@ const Dashboard = () => {
                                   <span className="trusted-badge">Trusted</span>
                                 )}
                                 {acc.is2FaExpired && (
-                                  <span className="expired-badge">
-                                    2FA Expired
-                                  </span>
+                                  <span className="expired-badge">2FA Expired</span>
                                 )}
                               </div>
                               <p className="device-detail">
                                 <strong>OS:</strong> {acc?.os || "Unknown"}
                               </p>
                               <p className="device-detail">
-                                <strong>IP Address:</strong>{" "}
-                                {acc?.ip || "Unknown"}
+                                <strong>IP Address:</strong> {acc?.ip || "Unknown"}
                               </p>
                               <p className="device-detail">
                                 <strong>Login Date:</strong> {loginDate}
@@ -193,10 +191,7 @@ const Dashboard = () => {
                             </div>
                             <button
                               onClick={() =>
-                                handleLogoutFromDevice(
-                                  acc.sessionId,
-                                  acc?.deviceName || "Device"
-                                )
+                                handleLogoutFromDevice(acc.sessionId, acc?.deviceName || "Device")
                               }
                               disabled={loggingOutDeviceId === acc.sessionId}
                               className="logout-device-button"
@@ -208,10 +203,7 @@ const Dashboard = () => {
                           </div>
                         );
                       })}
-                      <button
-                        onClick={handleAllLogout}
-                        className="logout-all-button"
-                      >
+                      <button onClick={handleAllLogout} className="logout-all-button">
                         Logout All Account
                       </button>
                     </>
@@ -224,6 +216,18 @@ const Dashboard = () => {
           </div>
         </div>
       </main>
+
+      {showDisable2FAModal && (
+        <Disable2FA
+          onSuccess={() => {
+            setShowDisable2FAModal(false);
+            alert("2FA has been successfully disabled");
+            // Refresh user data to update enabled_2fa status
+            window.location.reload();
+          }}
+          onCancel={() => setShowDisable2FAModal(false)}
+        />
+      )}
     </div>
   );
 };

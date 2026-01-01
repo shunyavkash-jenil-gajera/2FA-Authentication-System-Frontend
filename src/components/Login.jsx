@@ -99,11 +99,7 @@ const Login = () => {
                 onChange={handleChange}
               />
 
-              <button
-                type="button"
-                className="toggle-password"
-                onClick={toggleShowPassword}
-              >
+              <button type="button" className="toggle-password" onClick={toggleShowPassword}>
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
@@ -119,11 +115,7 @@ const Login = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="auth-google-button"
-          >
+          <button type="button" onClick={handleGoogleLogin} className="auth-google-button">
             <svg className="auth-google-icon" viewBox="0 0 24 24">
               <path
                 fill="currentColor"

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { authAPI } from "../services/api.service.js";
+import { authAPI } from "../services/api.js";
 import { getDeviceFingerprint } from "../services/fingerprint.service.js";
 
 const AuthContext = createContext();
@@ -95,12 +95,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.success) {
-        const {
-          accessToken,
-          user: userData,
-          skipTwoFA: skip2FA,
-          session,
-        } = response.data;
+        const { accessToken, user: userData, skipTwoFA: skip2FA, session } = response.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(userData));
         setToken(accessToken);
@@ -206,9 +201,37 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.enable2FA();
       if (response.success) {
+        // Update user with secret in localStorage and state
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          userData.secrete2fa = response.data.secret;
+          localStorage.setItem("user", JSON.stringify(userData));
+          setUser(userData);
+        }
         return response.data;
       }
       throw new Error(response.message || "Failed to enable 2FA");
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const disable2FA = async (password, otp) => {
+    try {
+      const response = await authAPI.disable2FA(password, otp);
+      if (response.success) {
+        // Update user in localStorage and state
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          userData.enabled_2fa = false;
+          localStorage.setItem("user", JSON.stringify(userData));
+          setUser(userData);
+        }
+        return { success: true, data: response.data };
+      }
+      throw new Error(response.message || "Failed to disable 2FA");
     } catch (error) {
       throw error;
     }
@@ -219,18 +242,12 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.verifyOTP({ otp, accessToken });
       if (response.success) {
         if (response.data.session?.accessToken) {
-          localStorage.setItem(
-            "accessToken",
-            response.data.session.accessToken
-          );
+          localStorage.setItem("accessToken", response.data.session.accessToken);
           setToken(response.data.session.accessToken);
         }
 
         if (response.data.session?.twoFaExpiry) {
-          localStorage.setItem(
-            "twoFaExpiry",
-            response.data.session.twoFaExpiry
-          );
+          localStorage.setItem("twoFaExpiry", response.data.session.twoFaExpiry);
         }
 
         const storedUser = localStorage.getItem("user");
@@ -262,10 +279,11 @@ export const AuthProvider = ({ children }) => {
     logout,
     logoutAll,
     enable2FA,
+    disable2FA,
     verifyOTP,
-    needs2FASetup: !!user && !user?.enabled_2fa && !!token,
-    is2FARequired: !!user?.enabled_2fa && !!token && !otpVerified && !skipTwoFA,
-    isAuthenticated: !!user && !!token && user?.enabled_2fa && otpVerified,
+    needs2FASetup: !!user && user?.enabled_2fa && !user?.secrete2fa && !!token,
+    is2FARequired: !!user?.enabled_2fa && user?.secrete2fa && !!token && !otpVerified && !skipTwoFA,
+    isAuthenticated: !!user && !!token && user?.enabled_2fa && user?.secrete2fa && otpVerified,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
