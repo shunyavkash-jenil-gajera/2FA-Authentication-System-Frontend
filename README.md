@@ -526,22 +526,6 @@ useEffect(() => {
 npm run build
 ```
 
-### Deploy to Hosting Services
-
-**Vercel:**
-
-```bash
-npm install -g vercel
-vercel
-```
-
-**Netlify:**
-
-```bash
-npm install -g netlify-cli
-netlify deploy --prod --dir=dist
-```
-
 **GitHub Pages:**
 
 ```bash
@@ -556,26 +540,6 @@ Update `.env` or set environment variables on hosting platform:
 ```
 VITE_API_BASE_URL=https://api.yourdomain.com/api/v1
 ```
-
-## 📚 Additional Resources
-
-- [React Documentation](https://react.dev/)
-- [React Router Documentation](https://reactrouter.com/)
-- [Vite Documentation](https://vitejs.dev/)
-- [Axios Documentation](https://axios-http.com/)
-- [Fingerprint.js Documentation](https://fingerprint.com/js/)
-- [JWT.io](https://jwt.io/)
-
-## 🤝 Contributing
-
-1. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-2. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-3. Push to branch (`git push origin feature/AmazingFeature`)
-4. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see LICENSE file for details.
 
 ## 👤 Author
 
@@ -593,6 +557,6 @@ For issues or questions:
 
 ---
 
-**Last Updated**: December 31, 2025
+**Last Updated**: January 1, 2026
 **Version**: 1.0.0
 **Status**: Production Ready ✅
