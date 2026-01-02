@@ -95,7 +95,12 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.success) {
-        const { accessToken, user: userData, skipTwoFA: skip2FA, session } = response.data;
+        const {
+          accessToken,
+          user: userData,
+          skipTwoFA: skip2FA,
+          session,
+        } = response.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(userData));
         setToken(accessToken);
@@ -201,7 +206,6 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.enable2FA();
       if (response.success) {
-        // Update user with secret in localStorage and state
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const userData = JSON.parse(storedUser);
@@ -221,7 +225,6 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.disable2FA(password, otp);
       if (response.success) {
-        // Update user in localStorage and state
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const userData = JSON.parse(storedUser);
@@ -242,12 +245,18 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.verifyOTP({ otp, accessToken });
       if (response.success) {
         if (response.data.session?.accessToken) {
-          localStorage.setItem("accessToken", response.data.session.accessToken);
+          localStorage.setItem(
+            "accessToken",
+            response.data.session.accessToken
+          );
           setToken(response.data.session.accessToken);
         }
 
         if (response.data.session?.twoFaExpiry) {
-          localStorage.setItem("twoFaExpiry", response.data.session.twoFaExpiry);
+          localStorage.setItem(
+            "twoFaExpiry",
+            response.data.session.twoFaExpiry
+          );
         }
 
         const storedUser = localStorage.getItem("user");
@@ -267,6 +276,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const is2FACompleted =
+    skipTwoFA || (user?.enabled_2fa && user?.secrete2fa && otpVerified);
+
   const value = {
     user,
     token,
@@ -282,8 +294,14 @@ export const AuthProvider = ({ children }) => {
     disable2FA,
     verifyOTP,
     needs2FASetup: !!user && user?.enabled_2fa && !user?.secrete2fa && !!token,
-    is2FARequired: !!user?.enabled_2fa && user?.secrete2fa && !!token && !otpVerified && !skipTwoFA,
-    isAuthenticated: !!user && !!token && user?.enabled_2fa && user?.secrete2fa && otpVerified,
+    is2FARequired:
+      !!user?.enabled_2fa &&
+      user?.secrete2fa &&
+      !!token &&
+      !otpVerified &&
+      !skipTwoFA,
+    isAuthenticated:
+      !!user && !!token && (!user?.enabled_2fa || is2FACompleted),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { authAPI } from "../services/api.service.js";
+import { authAPI } from "../services/api.js";
 
 const AuthCallback = () => {
   const navigate = useNavigate();

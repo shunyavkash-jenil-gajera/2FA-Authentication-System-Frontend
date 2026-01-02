@@ -6,8 +6,9 @@ const Disable2FA = ({ onSuccess, onCancel }) => {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [step, setStep] = useState(1); // Step 1: Password, Step 2: OTP
+  const [step, setStep] = useState(1);
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
@@ -16,7 +17,7 @@ const Disable2FA = ({ onSuccess, onCancel }) => {
       return;
     }
     setError("");
-    setStep(2); // Move to OTP verification
+    setStep(2);
   };
 
   const handleDisable2FA = async (e) => {
@@ -36,12 +37,13 @@ const Disable2FA = ({ onSuccess, onCancel }) => {
         alert("2FA disabled successfully!");
         onSuccess();
       }
-    } catch (err) {
-      setError(err.message || "Failed to disable 2FA");
+    } catch (error) {
+      setError(error?.response?.data?.message || "Failed to disable 2FA");
     } finally {
       setLoading(false);
     }
   };
+  const toggleShowPassword = () => setShowPassword((prev) => !prev);
 
   return (
     <div className="modal-overlay">
@@ -58,12 +60,14 @@ const Disable2FA = ({ onSuccess, onCancel }) => {
         {step === 1 ? (
           <form onSubmit={handlePasswordSubmit}>
             <div className="modal-body">
-              <p className="modal-info">To disable 2FA, please enter your password first.</p>
-              <div className="form-group">
+              <p className="modal-info">
+                To disable 2FA, please enter your password first.
+              </p>
+              <div className="form-group password-group">
                 <label htmlFor="password">Password</label>
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -71,13 +75,26 @@ const Disable2FA = ({ onSuccess, onCancel }) => {
                   }}
                   placeholder="Enter your password"
                   disabled={loading}
-                  className="form-input"
+                  className="auth-input auth-input-last"
                   required
                 />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  style={{ top: "70%" }}
+                  onClick={toggleShowPassword}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
               </div>
             </div>
             <div className="modal-footer">
-              <button type="button" onClick={onCancel} disabled={loading} className="btn-secondary">
+              <button
+                type="button"
+                onClick={onCancel}
+                disabled={loading}
+                className="btn-secondary"
+              >
                 Cancel
               </button>
               <button type="submit" disabled={loading} className="btn-primary">
@@ -89,7 +106,8 @@ const Disable2FA = ({ onSuccess, onCancel }) => {
           <form onSubmit={handleDisable2FA}>
             <div className="modal-body">
               <p className="modal-info">
-                Now, please enter the OTP from your authenticator app to confirm.
+                Now, please enter the OTP from your authenticator app to
+                confirm.
               </p>
               <div className="form-group">
                 <label htmlFor="otp">OTP Code</label>

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { authAPI } from "../services/api.service";
+import { authAPI } from "../services/api";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: "jenil@gmail.com",
-    password: "Jenil@1234",
+    email: "dd@gmail.com",
+    password: "Darshan@1234",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,9 @@ const Login = () => {
 
     try {
       const result = await login(formData.email, formData.password);
+      console.log(result);
       if (result?.skipTwoFA) {
+        console.log("dashboard");
         navigate("/dashboard");
       } else if (result?.success) {
         navigate("/dashboard");
@@ -99,7 +101,11 @@ const Login = () => {
                 onChange={handleChange}
               />
 
-              <button type="button" className="toggle-password" onClick={toggleShowPassword}>
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={toggleShowPassword}
+              >
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
@@ -115,7 +121,11 @@ const Login = () => {
             </div>
           </div>
 
-          <button type="button" onClick={handleGoogleLogin} className="auth-google-button">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="auth-google-button"
+          >
             <svg className="auth-google-icon" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
